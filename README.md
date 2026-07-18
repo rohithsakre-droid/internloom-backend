@@ -3,6 +3,9 @@
 RESTful API for the InternLoom hackathon problem statement. Node.js + Express +
 MongoDB (Mongoose) + JWT auth.
 
+See [API_REFERENCE.md](./API_REFERENCE.md) for every endpoint with example
+requests and responses (Postman-collection equivalent, pre-populated with test data).
+
 ## Run locally (under 5 minutes)
 
 1. **Install dependencies**
