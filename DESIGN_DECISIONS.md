@@ -4,11 +4,11 @@
 
 A verified student who changes their email is never locked out. `Student.collegeEmail`
 is only ever overwritten once the *new* address is confirmed. When a student calls
-`POST /api/auth/student/change-email`, we stage the new address in a separate
+`POST /api/auth/student/change-email`, I stage the new address in a separate
 `pendingEmail` field and send an OTP to it — `collegeEmail` and `isVerified` are
 untouched. The student keeps applying, logging in, and using the platform exactly as
 before under their old, still-verified email. Only when they submit the correct OTP
-via `POST /api/auth/student/verify-otp` do we swap `pendingEmail` into `collegeEmail`.
+via `POST /api/auth/student/verify-otp` do I swap `pendingEmail` into `collegeEmail`.
 If they never verify, nothing breaks — they simply stay on the old email indefinitely.
 
 ## 2. Editing an Active listing's skills with existing applicants (Section 3.3)
@@ -18,11 +18,11 @@ from whatever the listing currently contains (`services/matchingService.js`). Th
 means there is no staleness problem to solve: the moment a company edits
 `requiredSkills` on an Active listing, every subsequent `GET /listings` for students
 and every `GET /listings/:id/applicants` for the company reflects the new skills
-immediately. We do keep one historical field, `matchScoreAtApplication`, snapshotted
+immediately. I do keep one historical field, `matchScoreAtApplication`, snapshotted
 onto the `Application` document at the moment a student applied — this is a record of
 "what the score was when they applied," not a live value, and it is never used for
-ranking. The tradeoff we accepted: a student could see their live rank shift after a
-company edits a listing they've already applied to. We consider this correct behavior
+ranking. The tradeoff I accepted: a student could see their live rank shift after a
+company edits a listing they've already applied to. I consider this correct behavior
 (the listing genuinely changed) rather than a bug to hide.
 
 ## 3. Withdrawal reopening a Closed listing (Section 3.5)
@@ -31,7 +31,7 @@ The general state machine (`Listing.ALLOWED_TRANSITIONS`) forbids `Closed -> Act
 and that rule is enforced on every *company-initiated* transition via
 `PATCH /listings/:id/status`. But an auto-close caused by hitting the applicant cap is
 a system decision, not a company decision — and a withdrawal can legitimately undo the
-condition that caused it. We resolve the contradiction with a dedicated boolean,
+condition that caused it. I resolve the contradiction with a dedicated boolean,
 `autoClosedByCap`, set only when the system (not the company) closes a listing for
 hitting its cap. `withdrawApplication` is the *only* code path allowed to move a
 listing from `Closed` back to `Active`, and only when all of these hold: the listing is
@@ -48,8 +48,8 @@ alignment (20 pts), listing recency (20 pts) — summed, then scaled by a
 completeness multiplier (0.5–1.0) so an identical skill match ranks lower on an
 incomplete profile without ever zeroing it out.
 
-For a single student's `GET /listings` request we never compare across students.
-We filter candidate listings at the DB level first (`{status: 'Active',
+For a single student's `GET /listings` request I never compare across students.
+I filter candidate listings at the DB level first (`{status: 'Active',
 applicationDeadline: {$gt: now}}`, backed by a compound index), build the student's
 skill `Set` once, then score each candidate listing in roughly constant time
 (bounded by that listing's own skill-list size). Total cost is O(L) in the number of
