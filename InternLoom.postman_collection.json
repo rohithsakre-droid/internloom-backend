@@ -1,0 +1,202 @@
+{
+  "info": { "name": "InternLoom API", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5050/api" },
+    { "key": "studentAccessToken", "value": "" },
+    { "key": "companyAccessToken", "value": "" },
+    { "key": "listingId", "value": "" },
+    { "key": "applicationId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Student",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/student/register",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Priya Sharma\",\n  \"email\": \"priya@vtu.ac.in\",\n  \"password\": \"Passw0rd!\"\n}" }
+          }
+        },
+        {
+          "name": "Verify Student OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/student/verify-otp",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"priya@vtu.ac.in\",\n  \"otp\": \"REPLACE_WITH_demoOtp_FROM_REGISTER_RESPONSE\"\n}" }
+          }
+        },
+        {
+          "name": "Login Student",
+          "event": [{ "listen": "test", "script": { "exec": ["const d=pm.response.json();","pm.collectionVariables.set('studentAccessToken', d.data.accessToken);"], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/student/login",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"priya@vtu.ac.in\",\n  \"password\": \"Passw0rd!\"\n}" }
+          }
+        },
+        {
+          "name": "Request Email Change",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }],
+            "url": "{{baseUrl}}/auth/student/change-email",
+            "body": { "mode": "raw", "raw": "{\n  \"newEmail\": \"priya.new@vtu.ac.in\"\n}" }
+          }
+        },
+        {
+          "name": "Register Company",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/company/register",
+            "body": { "mode": "raw", "raw": "{\n  \"companyName\": \"Acme Robotics\",\n  \"email\": \"hr@acme.com\",\n  \"password\": \"Passw0rd!\"\n}" }
+          }
+        },
+        {
+          "name": "Login Company (use seeded demo company)",
+          "event": [{ "listen": "test", "script": { "exec": ["const d=pm.response.json();","pm.collectionVariables.set('companyAccessToken', d.data.accessToken);"], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/company/login",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"demo@techcorp.com\",\n  \"password\": \"DemoPass123!\"\n}" }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/refresh",
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"REPLACE_WITH_REFRESH_TOKEN\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Student Profile",
+      "item": [
+        { "name": "Get My Profile", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }], "url": "{{baseUrl}}/students/me" } },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }],
+            "url": "{{baseUrl}}/students/me",
+            "body": { "mode": "raw", "raw": "{\n  \"college\": \"BMS College of Engineering\",\n  \"branch\": \"CSE\",\n  \"graduationYear\": 2026,\n  \"cgpa\": 8.7,\n  \"skills\": [\"React.js\", \"Node.js\", \"MongoDB\"],\n  \"githubUrl\": \"https://github.com/priya\",\n  \"linkedinUrl\": \"https://linkedin.com/in/priya\",\n  \"bio\": \"Full-stack dev\",\n  \"resumeUrl\": \"https://example.com/resume.pdf\"\n}" }
+          }
+        },
+        { "name": "Delete My Profile", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }], "url": "{{baseUrl}}/students/me" } }
+      ]
+    },
+    {
+      "name": "Company Profile",
+      "item": [
+        { "name": "Get My Company", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{companyAccessToken}}" }], "url": "{{baseUrl}}/companies/me" } },
+        {
+          "name": "Update My Company",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{companyAccessToken}}" }],
+            "url": "{{baseUrl}}/companies/me",
+            "body": { "mode": "raw", "raw": "{\n  \"description\": \"We build robots.\",\n  \"website\": \"https://acme.com\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Listings",
+      "item": [
+        {
+          "name": "Create Listing (Draft)",
+          "event": [{ "listen": "test", "script": { "exec": ["const d=pm.response.json();","pm.collectionVariables.set('listingId', d.data._id);"], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{companyAccessToken}}" }],
+            "url": "{{baseUrl}}/listings",
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Frontend Intern\",\n  \"description\": \"Build UI with React\",\n  \"requiredSkills\": [\"React.js\", \"JavaScript\"],\n  \"preferredSkills\": [\"TypeScript\"],\n  \"preferredBranches\": [\"CSE\", \"ECE\"],\n  \"targetGraduationYear\": 2026,\n  \"stipend\": 20000,\n  \"location\": \"remote\",\n  \"applicationDeadline\": \"2026-12-31T00:00:00.000Z\",\n  \"maxApplicantCap\": 5\n}" }
+          }
+        },
+        {
+          "name": "Activate Listing (Draft -> Active)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{companyAccessToken}}" }],
+            "url": "{{baseUrl}}/listings/{{listingId}}/status",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Active\"\n}" }
+          }
+        },
+        { "name": "Get My Listings (Company)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{companyAccessToken}}" }], "url": "{{baseUrl}}/listings/mine" } },
+        { "name": "Get Ranked Listings (Student)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }], "url": "{{baseUrl}}/listings?page=1&limit=10" } },
+        { "name": "Get Listing By Id", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }], "url": "{{baseUrl}}/listings/{{listingId}}" } },
+        {
+          "name": "Update Listing",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{companyAccessToken}}" }],
+            "url": "{{baseUrl}}/listings/{{listingId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"requiredSkills\": [\"React.js\", \"JavaScript\", \"MongoDB\"]\n}" }
+          }
+        },
+        {
+          "name": "Close Listing (Active -> Closed)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{companyAccessToken}}" }],
+            "url": "{{baseUrl}}/listings/{{listingId}}/status",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Closed\"\n}" }
+          }
+        },
+        { "name": "Get Applicants For Listing", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{companyAccessToken}}" }], "url": "{{baseUrl}}/listings/{{listingId}}/applicants" } }
+      ]
+    },
+    {
+      "name": "Applications",
+      "item": [
+        {
+          "name": "Apply To Listing",
+          "event": [{ "listen": "test", "script": { "exec": ["const d=pm.response.json();","pm.collectionVariables.set('applicationId', d.data.applicationId);"], "type": "text/javascript" } }],
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }], "url": "{{baseUrl}}/listings/{{listingId}}/apply" }
+        },
+        { "name": "Get My Applications (Student)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }], "url": "{{baseUrl}}/applications/mine" } },
+        { "name": "Withdraw Application", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }], "url": "{{baseUrl}}/applications/{{applicationId}}/withdraw" } },
+        {
+          "name": "Update Application Status (Company)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{companyAccessToken}}" }],
+            "url": "{{baseUrl}}/applications/{{applicationId}}/status",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Under Review\"\n}" }
+          }
+        },
+        {
+          "name": "Bulk Update Application Status (Company)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{companyAccessToken}}" }],
+            "url": "{{baseUrl}}/applications/bulk-status",
+            "body": { "mode": "raw", "raw": "{\n  \"listingId\": \"{{listingId}}\",\n  \"fromStatus\": \"Submitted\",\n  \"toStatus\": \"Rejected\",\n  \"olderThanDays\": 7\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        { "name": "Get My Notifications", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }], "url": "{{baseUrl}}/notifications?page=1&limit=20" } },
+        { "name": "Get Unread Notifications", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }], "url": "{{baseUrl}}/notifications?isRead=false" } },
+        { "name": "Mark One Read", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }], "url": "{{baseUrl}}/notifications/REPLACE_NOTIFICATION_ID/read" } },
+        { "name": "Mark All Read", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{studentAccessToken}}" }], "url": "{{baseUrl}}/notifications/read-all" } }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [{ "name": "Health Check", "request": { "method": "GET", "url": "http://localhost:5050/health" } }]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# Use this workspace to collaborate
+workspace:
+  id: 3ca50eda-d20d-4c54-8af9-2d83db03b378
+
+localResources:
+  collections:
+    - ../InternLoom.postman_collection.json
