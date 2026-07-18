@@ -1,5 +1,82 @@
 # Database Schema (ERD)
 
+## Visual diagram
+
+### Core entities
+
+```mermaid
+erDiagram
+    STUDENT  ||--o{ APPLICATION : submits
+    COMPANY  ||--o{ LISTING     : posts
+    LISTING  ||--o{ APPLICATION : receives_applications
+
+    STUDENT {
+        ObjectId _id
+        string   name
+        string   collegeEmail
+        string   pendingEmail
+        boolean  isVerified
+        string   branch
+        number   graduationYear
+        number   cgpa
+        array    skills
+        string   resumeUrl
+    }
+
+    COMPANY {
+        ObjectId _id
+        string   companyName
+        string   companyEmail
+        boolean  isApproved
+    }
+
+    LISTING {
+        ObjectId _id
+        ObjectId company
+        string   title
+        array    requiredSkills
+        array    preferredSkills
+        array    preferredBranches
+        number   targetGraduationYear
+        date     applicationDeadline
+        number   maxApplicantCap
+        number   currentApplicantCount
+        string   status
+        boolean  autoClosedByCap
+    }
+
+    APPLICATION {
+        ObjectId _id
+        ObjectId student
+        ObjectId listing
+        ObjectId company
+        string   status
+        number   matchScoreAtApplication
+    }
+```
+
+### Notification relationships (kept separate to avoid line crossing above)
+
+`NOTIFICATION.recipient` is polymorphic — a Student OR a Company per row, via
+Mongoose's `refPath` — so it has one relationship to each, shown here on its own:
+
+```mermaid
+erDiagram
+    STUDENT      ||--o{ NOTIFICATION : is_notified_as_student
+    COMPANY      ||--o{ NOTIFICATION : is_notified_as_company
+
+    NOTIFICATION {
+        ObjectId _id
+        string   recipientType
+        ObjectId recipient
+        string   type
+        string   message
+        boolean  isRead
+    }
+```
+
+## Field-level detail (text form)
+
 ```
 Student                          Company
 --------                         --------
